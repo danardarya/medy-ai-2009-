@@ -5,7 +5,33 @@ function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show")
 function headers(){return {"Content-Type":"application/json",...(token?{Authorization:"Bearer "+token}:{})}}
 async function api(url,opts={}){const r=await fetch(url,{...opts,headers:{...headers(),...(opts.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"Si è verificato un errore.");return d}
 function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===id));const names={home:"Panoramica",chat:"MEDY Chat",image:"MEDY Image",video:"MEDY Video",studio:"MEDY Studio",history:"Cronologia",settings:"Impostazioni"};$("crumb").textContent=names[id]||id;if(id==="history")loadHistory();if(id==="settings")syncUser()}
-function syncUser(){if(currentUser){$("sideName").textContent=currentUser.name;$("sideEmail").textContent=currentUser.email;$("avatar").textContent=currentUser.name[0].toUpperCase();$("settingsName").textContent=currentUser.name;$("settingsEmail").textContent=currentUser.email}else{$("sideName").textContent="Ospite";$("sideEmail").textContent="Accedi per iniziare";$("avatar").textContent="M";$("settingsName").textContent="Non hai effettuato l'accesso";$("settingsEmail").textContent="Accedi o crea un account per salvare i tuoi progetti."}}
+function syncUser(){
+  const btn = $("headerAccount");
+
+  if(currentUser){
+    $("sideName").textContent=currentUser.name;
+    $("sideEmail").textContent=currentUser.email;
+    $("avatar").textContent=currentUser.name[0].toUpperCase();
+    $("settingsName").textContent=currentUser.name;
+    $("settingsEmail").textContent=currentUser.email;
+    if(btn) btn.textContent=currentUser.name;
+  }else{
+    $("sideName").textContent="Ospite";
+    $("sideEmail").textContent="Accedi per iniziare";
+    $("avatar").textContent="M";
+    $("settingsName").textContent="Non hai effettuato l'accesso";
+    $("settingsEmail").textContent="Accedi o crea un account per salvare i tuoi progetti.";
+    if(btn) btn.textContent="Accedi / Registrati";
+  }
+}
+
+function headerAccountClick(){
+  if(currentUser){
+    showPage("settings");
+  }else{
+    openAuth();
+  }
+}if(currentUser){$("sideName").textContent=currentUser.name;$("sideEmail").textContent=currentUser.email;$("avatar").textContent=currentUser.name[0].toUpperCase();$("settingsName").textContent=currentUser.name;$("settingsEmail").textContent=currentUser.email}else{$("sideName").textContent="Ospite";$("sideEmail").textContent="Accedi per iniziare";$("avatar").textContent="M";$("settingsName").textContent="Non hai effettuato l'accesso";$("settingsEmail").textContent="Accedi o crea un account per salvare i tuoi progetti."}}
 async function boot(){if(token){try{const d=await api("/api/me");currentUser=d.user}catch{token="";localStorage.removeItem("medy_token")}}syncUser()}
 function openAuth(){$("authModal").classList.remove("hidden");$("authError").textContent=""}
 function closeAuth(){$("authModal").classList.add("hidden")}
